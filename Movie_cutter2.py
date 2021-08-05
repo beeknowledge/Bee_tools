@@ -1,3 +1,8 @@
+
+#######################################################
+# custom edit by takashide BND Jan 2021 Copyright(c) #
+#######################################################
+
 import os,sys
 from tkinter import *
 from tkinter import ttk
@@ -6,7 +11,16 @@ from tkinter import messagebox
 import ffmpeg
 import cv2
 import numpy as np
+import random
+import string
 
+
+def GetRandomStr(num):
+    # 英数字をすべて取得
+    dat = string.digits + string.ascii_lowercase + string.ascii_uppercase
+
+    # 英数字からランダムに取得
+    return ''.join([random.choice(dat) for i in range(num)])
 
 # スピナーコントロール
 
@@ -57,9 +71,12 @@ def button2_clicked():
     messagebox.showinfo('Video to Frame Tool', u'切り出し終了')
 
 def m_slice(path, dir, step, extension):
+    Numname = GetRandomStr(3)
     movie = cv2.VideoCapture(path)                  # 動画の読み込み
     Fs = int(movie.get(cv2.CAP_PROP_FRAME_COUNT))   # 動画の全フレーム数を計算
-    path_head = dir + '/out_'                       # 静止画のファイル名のヘッダー
+    path_head = dir + '/' + Numname + 'out_'
+    #path_head = dir + '/out_'
+    # 静止画のファイル名のヘッダー
     ext_index = np.arange(0, Fs, step)              # 静止画を抽出する間隔
     for i in range(Fs - 1):                         # フレームサイズ分のループを回す
         flag, frame = movie.read()                  # 動画から1フレーム読み込む
