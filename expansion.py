@@ -9,6 +9,8 @@ import tkinter
 from os import listdir
 from tkinter import filedialog
 from tkinter import messagebox
+import datetime
+import shutil
 
 def folder_select1():
     idir = '.'
@@ -24,6 +26,7 @@ def folder_select2():
     return fld2
 
 def expansion():
+    traintext = []
     in_folder = str(input_box1.get())
     if not in_folder:
         messagebox.showerror("エラー", "入力に漏れがあります")
@@ -45,8 +48,8 @@ def expansion():
         ex_folder_ad = ex_folder
         
     #wsize,hsize:ベースとなる解像度の幅と高さ
-    wsize = input_box4.get()
-    hsize = input_box3.get()
+    wsize = input_box3.get()
+    hsize = input_box4.get()
     #無効な数字
     if wsize.isdecimal() == False:
         messagebox.showerror("エラー", "解像度は整数で入力してください")
@@ -98,7 +101,7 @@ def expansion():
     if len(files) == 0:
         messagebox.showerror("エラー", "無効なファイル名です")
 
-    txt_dir = ex_folder_ad + '/expansion_Texts'
+    txt_dir = ex_folder_ad + '/obj_train_data'
         
     os.makedirs(txt_dir, exist_ok = True)
         
@@ -152,10 +155,13 @@ def expansion():
         x = w/2
         y = h/2
         annotation = []
+        traintext.append(basename + rotname + sizname + '.txt')
+
+
         while k < h_return:
                 l =0
                 while l < w_return:
-                    hhh = str(cls) + ' ' + str('{:.06f}'.format(round(x/wsize, 6))) + ' ' + str('{:.06f}'.format(round(y/hsize, 6))) + ' ' + str('{:.06f}'.format(round(0.95*w/wsize, 6))) + ' ' + str('{:.06f}'.format(round(0.95*h/hsize, 6)))
+                    hhh = str(cls) + ' ' + str('{:.06f}'.format(round(x/w/w_return, 6))) + ' ' + str('{:.06f}'.format(round(y/h/h_return, 6))) + ' ' + str('{:.06f}'.format(round(0.95*w/w/w_return, 6))) + ' ' + str('{:.06f}'.format(round(0.95*h/h/h_return, 6)))
                     annotation.append([hhh])
                     x += w
                     l +=1
@@ -168,7 +174,17 @@ def expansion():
                     writer = csv.writer(fout)
                     writer.writerows(annotation)
                     fout.close
+
+    with open(ex_folder_ad + '/' + 'train.txt', 'w') as f_new:
+        for n in traintext:
+            n= "data/obj_train_data/" + n
+            print(n)
+            f_new.write("%s\n" % n)
+            #f_new.write(n)
+    dt = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+    shutil.make_archive(dt + '_output', 'zip', root_dir=ex_folder_ad)
     messagebox.showinfo("確認","出力が完了しました")
+    #print(traintext)
 
 win = tkinter.Tk()
 win.title("教師データ拡張ツール")
@@ -193,7 +209,7 @@ input_label1 = tkinter.Label(text = "入力 (フォルダ)")
 input_label1.place(x = 20, y = 30)
 input_label2 = tkinter.Label(text = "出力 (フォルダ)")
 input_label2.place(x = 20, y = 80)
-input_label3 = tkinter.Label(text = "出力解像度(縦×横)")
+input_label3 = tkinter.Label(text = "出力解像度(幅×高さ)")
 input_label3.place(x = 10, y = 130)
 input_label5 = tkinter.Label(text = "クラス番号")
 input_label5.place(x = 30, y = 180)
